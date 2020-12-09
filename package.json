@@ -1,0 +1,40 @@
+{
+  "name": "next-app-starter",
+  "version": "1.0.0",
+  "description": "A quick starter to spin up my fav tools for build apps quickly",
+  "main": "index.js",
+  "repository": "git@github.com:ericadamski/next-app-starter.git",
+  "author": "Eric Adamski <er.adamski@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "next start -p 3001",
+    "build": "next build",
+    "dev": "next dev -p 3001",
+    "emulators": "yarn firebase emulators:start --only auth,firebase"
+  },
+  "dependencies": {
+    "@geist-ui/react": "^2.1.0-canary.2",
+    "@hapi/iron": "^6.0.0",
+    "@testing-library/cypress": "^7.0.2",
+    "firebase": "^8.0.2",
+    "firebase-admin": "^9.4.1",
+    "framer-motion": "^2.9.4",
+    "js-cookie": "^2.2.1",
+    "jsonwebtoken": "^8.5.1",
+    "libphonenumber-js": "^1.9.4",
+    "next": "^10.0.1",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "react-hook-form": "^6.11.5",
+    "swr": "^0.3.8",
+    "twilio": "^3.52.0",
+    "uuid": "^8.3.1"
+  },
+  "devDependencies": {
+    "@welldone-software/why-did-you-render": "^6.0.3",
+    "cypress": "^6.0.0",
+    "dotenv": "^8.2.0",
+    "firebase-tools": "^8.16.2",
+    "msw": "^0.23.0"
+  }
+}

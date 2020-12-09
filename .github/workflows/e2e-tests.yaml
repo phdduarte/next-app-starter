@@ -1,0 +1,74 @@
+name: E2E Tests
+on: push
+
+jobs:
+  cypress:
+    runs-on: ubuntu-16.04
+    name: Chrome
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: NextJS cache
+        uses: actions/cache@v2
+        with:
+          path: .next/cache
+          key: ${{ runner.os }}-nextjs
+      - name: Node modules cache
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
+      - name: Cache Cypress
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/Cypress
+          key: ${{ runner.os }}-cypress
+      - name: Cache Firebase emulators
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/firebase/emulators
+          key: ${{ runner.os }}-fbemulators
+      - name: Install Node modules
+        run: yarn install --frozen-lockfile
+        env:
+          CYPRESS_INSTALL_BINARY: 0
+      - name: Start Firebase emluators
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: |
+          yarn firebase emulators:start --only auth,firestore &
+      - name: Build and start frontend
+        run: |
+          yarn dev &
+        env:
+          FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"
+          FIRESTORE_EMULATOR_HOST: "localhost:8888"
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
+          FIREBASE_CLIENT_EMAIL: ${{ secrets.FIREBASE_CLIENT_EMAIL }}
+          NEXT_PUBLIC_FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
+          NEXT_PUBLIC_FIREBASE_PUBLIC_API_KEY: ${{ secrets.FIREBASE_PUBLIC_API_KEY }}
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          TWILIO_ACCOUNT_SID_TEST: ${{ secrets.TWILIO_ACCOUNT_SID_TEST }}
+          TWILIO_AUTH_TOKEN_TEST: ${{ secrets.TWILIO_AUTH_TOKEN_TEST }}
+          TWILIO_VERIFY_SERVICE_SID: ${{ secrets.TWILIO_VERIFY_SERVICE_SID }}
+      - name: Install Cypress
+        run: npx cypress install
+      - name: Cypress run
+        id: cypress
+        uses: cypress-io/github-action@v2
+        env:
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
+          FIREBASE_CLIENT_EMAIL: ${{ secrets.FIREBASE_CLIENT_EMAIL }}
+          NEXT_PUBLIC_FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
+          NEXT_PUBLIC_FIREBASE_PUBLIC_API_KEY: ${{ secrets.FIREBASE_PUBLIC_API_KEY }}
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+        with:
+          env: HIGH_RESOLUTION=true NODE_ENV=test
+          wait-on: "http://localhost:3001"
+          wait-on-timeout: 120
+          install: false
